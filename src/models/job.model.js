@@ -3,8 +3,8 @@ import fetch from "node-fetch";
 class JobModel {
 
     getJobsData = async () => {
-        // let data = await fetch(`https://comanos.europersonal.com/api/public/v1/Stelle/Read`, {
-        let data = await fetch(`https://comanos.europersonal.com/api/public/v1/Stelle/Read?searchterm=4`, {
+        // let data = await fetch(`https://comanos.europersonal.com/api/public/v1/Stelle/Read?searchterm=1`, {
+        let data = await fetch(`https://comanos.europersonal.com/api/public/v1/Stelle/Read`, {
             method: "GET",
             headers: {
                 Accept: 'application/json',

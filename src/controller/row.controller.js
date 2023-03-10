@@ -13,76 +13,102 @@ const hubspotClient = new hubspot.Client({ "accessToken": process.env.ACCESS_TOK
 class RowController {
 
     create = async (req, res) => {
-        // const JobData = await jobModel.getJobsData();
+        const JobData = await jobModel.getJobsData();
         const rowData = await rowModel.getRowData();
-        // const rowData = await jobModel.getJobsData();
-        // const str = JSON.stringify(rowData);
-        // const a = JSON.parse(str)
-        // console.log(a)
+        const rowData2 = JSON.parse(rowData);
+
+        let data = {
+            JobData,
+            rowData2
+        }
 
         let newRowData = [];
         let updatedRowsData = [];
 
-        JobData.map((item1) => {
+        for (let i = 0; i < JobData.length; i++) {
+            let found = false;
 
-            rowData.map((item2) => {
-
-                if (item1.StelleUuid == item2.StelleUuid) {
-                    updatedRowsData = item1;
-                } else {
-                    newRowData = item2;
+            for (let j = 0; j < rowData2.length; j++) {
+                if (JobData[i].StelleUuid === rowData2[j].values.job_id) {
+                    updatedRowsData.push({
+                        "hs_id": rowData2[j].id,
+                        job_title: rowData2[j].values.job_title,
+                        ...JobData[i],
+                    });
+                    found = true;
+                    break;
                 }
+            }
 
-            });
+            if (!found) {
+                newRowData.push(JobData[i]);
+            }
+        }
 
-        });
+        data['newRowData'] = newRowData;
+        data['updatedRowsData'] = updatedRowsData;
+        // res.status(200).send(data);
 
         const tableIdOrName = process.env.TABLE_NAME_OR_ID;
 
-        if (newRowData != '') {
-            const values = {
-                "job_title": newRowData.Bezeichnung,
-                "job_id": newRowData.StelleUuid
-            };
-            // console.log(values)
-            const HubDbTableRowV3Request = { path: "", name: "zvoove_jobs", values };
+        // Update Row
+        if (updatedRowsData.length > 0) {
+            let updateRowBatchValue = [];
 
-            try {
-                const apiResponse = await hubspotClient.cms.hubdb.rowsApi.createTableRow(tableIdOrName, HubDbTableRowV3Request);
-                // console.log(JSON.stringify(apiResponse.body, null, 2));
-                res.status(200).send(apiResponse);
-            } catch (e) {
-                e.message === 'HTTP request failed'
-                    ? console.error(JSON.stringify(e.response, null, 2))
-                    : console.error(e)
-            }
+            updatedRowsData.map(item => {
+                let obj = {
+                    "id": item.hs_id,
+                    "values": {
+                        "job_id": item.StelleUuid,
+                        "job_title": item.Bezeichnung
+                    }
+                }
+                updateRowBatchValue.push(obj);
+            })
 
-        } else if (updatedRowsData != '') {
             const BatchInputJsonNode = {
-                inputs: [
-                    {
-                        "id": "62703432947",
-                        "values": {
-                            // "job_title": newRowData.Bezeichnung,
-                            "job_title": "Testposition zur Einrichtung von Zvoove - CX Test",
-                            "job_id": newRowData.StelleUuid
-                        }
-                    },
-                ]
+                inputs: updateRowBatchValue
             };
-            console.log(BatchInputJsonNode)
+
             try {
                 const apiResponse = await hubspotClient.cms.hubdb.rowsBatchApi.batchUpdateDraftTableRows(tableIdOrName, BatchInputJsonNode);
-                // console.log(JSON.stringify(apiResponse.body, null, 2));
-                res.status(200).send(apiResponse);
+                console.log('apiResponse--->', apiResponse);
             } catch (e) {
-                e.message === 'HTTP request failed'
-                    ? console.error(JSON.stringify(e.response, null, 2))
-                    : console.error(e)
+                e.message === 'HTTP request failed' ?
+                    console.error(JSON.stringify(e.response, null, 2)) :
+                    console.error(e)
             }
 
-        } else {
-            console.log('Somthing went wrong!')
+        }
+
+        // Create Row
+        if (newRowData.length > 0) {
+            let newRowDataValue = [];
+
+            newRowData.map(item => {
+                let obj = {
+                    "values": {
+                        "job_id": item.StelleUuid,
+                        "job_title": item.Bezeichnung
+                    }
+                }
+                newRowDataValue.push(obj);
+            })
+
+            const BatchInputJsonNodeCreate = {
+                inputs: newRowDataValue
+            };
+
+            try {
+                const apiResponse = await hubspotClient.cms.hubdb.rowsBatchApi.batchCreateDraftTableRows(tableIdOrName, BatchInputJsonNodeCreate);
+                console.log('apiResponse--->', apiResponse);
+            } catch (e) {
+                e.message === 'HTTP request failed'
+                    ? console.error(JSON.stringify(e.response,
+                        null,
+                        2))
+                    : console.error(e)
+            }
         }
 
     };
@@ -100,9 +126,9 @@ class RowController {
             // console.log(JSON.stringify(apiResponse.body, null, 2));
             res.status(200).send(apiResponse);
         } catch (e) {
-            e.message === 'HTTP request failed'
-                ? console.error(JSON.stringify(e.response, null, 2))
-                : console.error(e)
+            e.message === 'HTTP request failed' ?
+                console.error(JSON.stringify(e.response, null, 2)) :
+                console.error(e)
         }
     };
 
@@ -120,9 +146,9 @@ class RowController {
             // console.log(JSON.stringify(apiResponse.body, null, 2));
             res.status(200).send(apiResponse);
         } catch (e) {
-            e.message === 'HTTP request failed'
-                ? console.error(JSON.stringify(e.response, null, 2))
-                : console.error(e)
+            e.message === 'HTTP request failed' ?
+                console.error(JSON.stringify(e.response, null, 2)) :
+                console.error(e)
         }
     };
 
@@ -138,19 +164,18 @@ class RowController {
             //         "test_column": "this sample text value updated by vikram 1", "test_column": "this sample text value updated by vikram 2"
             //     }
             // }]
-            inputs: [
-                {
-                    "job_id": "100178072677",
-                    "values": {
-                        "job_title": "this sample text value updated by vikram 1"
-                    }
-                },
-                {
-                    "job_id": "100401034257",
-                    "values": {
-                        "job_title": "this sample text value updated by vikram 2"
-                    }
+            inputs: [{
+                "job_id": "100178072677",
+                "values": {
+                    "job_title": "this sample text value updated by vikram 1"
                 }
+            },
+            {
+                "job_id": "100401034257",
+                "values": {
+                    "job_title": "this sample text value updated by vikram 2"
+                }
+            }
             ]
         };
         const tableIdOrName = process.env.TABLE_NAME_OR_ID;
@@ -160,9 +185,9 @@ class RowController {
             // console.log(JSON.stringify(apiResponse.body, null, 2));
             res.status(200).send(apiResponse);
         } catch (e) {
-            e.message === 'HTTP request failed'
-                ? console.error(JSON.stringify(e.response, null, 2))
-                : console.error(e)
+            e.message === 'HTTP request failed' ?
+                console.error(JSON.stringify(e.response, null, 2)) :
+                console.error(e)
         }
     }
 
@@ -176,9 +201,9 @@ class RowController {
             // console.log(JSON.stringify(apiResponse.body, null, 2));
             res.status(200).send(apiResponse);
         } catch (e) {
-            e.message === 'HTTP request failed'
-                ? console.error(JSON.stringify(e.response, null, 2))
-                : console.error(e)
+            e.message === 'HTTP request failed' ?
+                console.error(JSON.stringify(e.response, null, 2)) :
+                console.error(e)
         }
     }
 

@@ -17,6 +17,8 @@ const PORT = process.env.PORT || process.env.APP_PORT || 1000;
 app.use(`/api/table`, tableRouter);
 app.use(`/api/row`, rowRouter);
 
+// http://localhost:1000/api/row/create  //using this url get data from zvoove api and insert into hs-db
+
 
 var server = app.listen(PORT, () =>
     console.log(`Server running on port ${PORT}!`));
