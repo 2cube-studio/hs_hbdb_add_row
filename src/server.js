@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 
 import tableRouter from './routes/table.routes.js'
 import rowRouter from './routes/row.routes.js';
+import emmployeeRouter from './routes/employee.routes.js';
 
 const app = express();
 dotenv.config();
@@ -16,6 +17,7 @@ const PORT = process.env.PORT || process.env.APP_PORT || 1000;
 
 app.use(`/api/table`, tableRouter);
 app.use(`/api/row`, rowRouter);
+app.use(`/api/employee`, emmployeeRouter);
 
 // http://localhost:1000/api/row/create  //using this url get data from zvoove api and insert into hs-db
 

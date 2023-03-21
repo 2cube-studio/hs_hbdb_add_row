@@ -13,9 +13,23 @@ const hubspotClient = new hubspot.Client({ "accessToken": process.env.ACCESS_TOK
 class RowController {
 
     create = async (req, res) => {
-        const JobData = await jobModel.getJobsData();
+        // const JobData = await jobModel.getJobsData();
+        // const rowData = await rowModel.getRowData();
+        // const rowData2 = JSON.parse(rowData);
+
+        const userJobData = await jobModel.getJobsData();
+
+        let UserNewRowData = [];
+
+        userJobData.forEach(element => {
+            UserNewRowData.push(element.StelleUuid);
+        });
+        const JobData = await jobModel.getUserJobsData(UserNewRowData);
+        //console.log(rowData)
+        // res.status(200).send(rowData);
         const rowData = await rowModel.getRowData();
         const rowData2 = JSON.parse(rowData);
+
 
         let data = {
             JobData,
@@ -33,6 +47,17 @@ class RowController {
                     updatedRowsData.push({
                         "hs_id": rowData2[j].id,
                         job_title: rowData2[j].values.job_title,
+                        bezeichnung: rowData2[j].values.bezeichnung,
+                        einsatzortort: rowData2[j].values.einsatzortOrt,
+                        stellenziel: rowData2[j].values.stellenziel,
+                        // aufgabenheader: rowData2[j].values.aufgabenheader,
+                        // aufgaben: rowData2[j].values.aufgaben,
+                        // fachlicheanforderungenheader: rowData2[j].values.fachlicheAnforderungenHeader,
+                        // fachlicheanforderungen: rowData2[j].values.fachlicheAnforderungen,
+                        // arbeitgeberleistungheader: rowData2[j].values.arbeitgeberleistungHeader,
+                        // arbeitgeberleistung: rowData2[j].values.arbeitgeberleistung,
+                        // arbeitgebervorstellungheader: rowData2[j].values.arbeitgebervorstellungHeader,
+                        // arbeitgebervorstellung: rowData2[j].values.arbeitgebervorstellung,
                         ...JobData[i],
                     });
                     found = true;
@@ -60,7 +85,18 @@ class RowController {
                     "id": item.hs_id,
                     "values": {
                         "job_id": item.StelleUuid,
-                        "job_title": item.Bezeichnung
+                        "job_title": item.Bezeichnung,
+                        "bezeichnung": item.Bezeichnung,
+                        "einsatzortort": item.EinsatzortOrt,
+                        "stellenziel": item.Stellenziel,
+                        // "aufgabenheader": item.AufgabenHeader,
+                        // "aufgaben": item.Aufgaben,
+                        // "fachlicheanforderungenheader": item.FachlicheAnforderungenHeader,
+                        // "fachlicheanforderungen": item.FachlicheAnforderungen,
+                        // "arbeitgeberleistungheader": item.ArbeitgeberleistungHeader,
+                        // "arbeitgeberleistung": item.Arbeitgeberleistung,
+                        // "arbeitgebervorstellungheader": item.ArbeitgebervorstellungHeader,
+                        // "arbeitgebervorstellung": item.Arbeitgebervorstellung
                     }
                 }
                 updateRowBatchValue.push(obj);
@@ -89,7 +125,18 @@ class RowController {
                 let obj = {
                     "values": {
                         "job_id": item.StelleUuid,
-                        "job_title": item.Bezeichnung
+                        "job_title": item.Bezeichnung,
+                        "bezeichnung": item.Bezeichnung,
+                        "einsatzortort": item.EinsatzortOrt,
+                        "stellenziel": item.Stellenziel,
+                        // "aufgabenheader": item.AufgabenHeader,
+                        // "aufgaben": item.Aufgaben,
+                        // "fachlicheanforderungenheader": item.FachlicheAnforderungenHeader,
+                        // "fachlicheanforderungen": item.FachlicheAnforderungen,
+                        // "arbeitgeberleistungheader": item.ArbeitgeberleistungHeader,
+                        // "arbeitgeberleistung": item.Arbeitgeberleistung,
+                        // "arbeitgebervorstellungheader": item.ArbeitgebervorstellungHeader,
+                        // "arbeitgebervorstellung": item.Arbeitgebervorstellung
                     }
                 }
                 newRowDataValue.push(obj);
