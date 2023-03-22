@@ -13,10 +13,6 @@ const hubspotClient = new hubspot.Client({ "accessToken": process.env.ACCESS_TOK
 class RowController {
 
     create = async (req, res) => {
-        // const JobData = await jobModel.getJobsData();
-        // const rowData = await rowModel.getRowData();
-        // const rowData2 = JSON.parse(rowData);
-
         const userJobData = await jobModel.getJobsData();
 
         let UserNewRowData = [];
@@ -25,11 +21,9 @@ class RowController {
             UserNewRowData.push(element.StelleUuid);
         });
         const JobData = await jobModel.getUserJobsData(UserNewRowData);
-        //console.log(rowData)
         // res.status(200).send(rowData);
         const rowData = await rowModel.getRowData();
         const rowData2 = JSON.parse(rowData);
-
 
         let data = {
             JobData,
@@ -50,14 +44,14 @@ class RowController {
                         bezeichnung: rowData2[j].values.bezeichnung,
                         einsatzortort: rowData2[j].values.einsatzortOrt,
                         stellenziel: rowData2[j].values.stellenziel,
-                        // aufgabenheader: rowData2[j].values.aufgabenheader,
-                        // aufgaben: rowData2[j].values.aufgaben,
-                        // fachlicheanforderungenheader: rowData2[j].values.fachlicheAnforderungenHeader,
-                        // fachlicheanforderungen: rowData2[j].values.fachlicheAnforderungen,
-                        // arbeitgeberleistungheader: rowData2[j].values.arbeitgeberleistungHeader,
-                        // arbeitgeberleistung: rowData2[j].values.arbeitgeberleistung,
-                        // arbeitgebervorstellungheader: rowData2[j].values.arbeitgebervorstellungHeader,
-                        // arbeitgebervorstellung: rowData2[j].values.arbeitgebervorstellung,
+                        aufgabenheader: rowData2[j].values.aufgabenHeader,
+                        aufgaben: rowData2[j].values.aufgaben,
+                        fachlicheanforderungenheader: rowData2[j].values.fachlicheAnforderungenHeader,
+                        fachlicheanforderungen: rowData2[j].values.fachlicheAnforderungen,
+                        arbeitgeberleistungheader: rowData2[j].values.arbeitgeberleistungHeader,
+                        arbeitgeberleistung: rowData2[j].values.arbeitgeberleistung,
+                        arbeitgebervorstellungheader: rowData2[j].values.arbeitgebervorstellungHeader,
+                        arbeitgebervorstellung: rowData2[j].values.arbeitgebervorstellung,
                         ...JobData[i],
                     });
                     found = true;
@@ -88,7 +82,7 @@ class RowController {
                         "job_title": item.Bezeichnung,
                         "bezeichnung": item.Bezeichnung,
                         "einsatzortort": item.EinsatzortOrt,
-                        "stellenziel": item.Stellenziel,
+                        "stellenziel": item.Stellenziel
                         // "aufgabenheader": item.AufgabenHeader,
                         // "aufgaben": item.Aufgaben,
                         // "fachlicheanforderungenheader": item.FachlicheAnforderungenHeader,
@@ -108,13 +102,12 @@ class RowController {
 
             try {
                 const apiResponse = await hubspotClient.cms.hubdb.rowsBatchApi.batchUpdateDraftTableRows(tableIdOrName, BatchInputJsonNode);
-                console.log('apiResponse--->', apiResponse);
+                console.log('update apiResponse--->', apiResponse);
             } catch (e) {
                 e.message === 'HTTP request failed' ?
                     console.error(JSON.stringify(e.response, null, 2)) :
                     console.error(e)
             }
-
         }
 
         // Create Row
@@ -128,7 +121,7 @@ class RowController {
                         "job_title": item.Bezeichnung,
                         "bezeichnung": item.Bezeichnung,
                         "einsatzortort": item.EinsatzortOrt,
-                        "stellenziel": item.Stellenziel,
+                        "stellenziel": item.Stellenziel
                         // "aufgabenheader": item.AufgabenHeader,
                         // "aufgaben": item.Aufgaben,
                         // "fachlicheanforderungenheader": item.FachlicheAnforderungenHeader,
@@ -148,7 +141,7 @@ class RowController {
 
             try {
                 const apiResponse = await hubspotClient.cms.hubdb.rowsBatchApi.batchCreateDraftTableRows(tableIdOrName, BatchInputJsonNodeCreate);
-                console.log('apiResponse--->', apiResponse);
+                console.log('create apiResponse--->', apiResponse);
             } catch (e) {
                 e.message === 'HTTP request failed'
                     ? console.error(JSON.stringify(e.response,
